@@ -6,7 +6,7 @@ BEGIN { use_ok( 'Data::Dump::Streamer', qw(:undump) ); }
 use strict;
 use warnings;
 use Data::Dumper;
-
+use JSON::XS qw(decode_json);
 # imports same()
 (my $helper=$0)=~s/\w+\.\w+$/test_helper.pl/;
 require $helper;
@@ -226,13 +226,13 @@ format STDOUT =
     else {
         $expected_dot = 'undef';
     }
+    my $jstrue= decode_json("true");
     my %hash = (
         UND => undef,
         IV  => 1,
         NV  => 3.14159265358979,
         PV  => "string",
         PV8 => "ab\ncd\x{20ac}\t",
-        PVM => "$!",
         RV  => \$.,
         AR  => [ 1..2 ],
         HR  => { key => "value" },
@@ -240,7 +240,8 @@ format STDOUT =
         GLB => *STDERR,
         IO  => *{$::{STDERR}}{IO},
         FMT => \*{$::{STDOUT}}{FORMAT},
-        OBJ => bless qr/("[^"]+")/,"Zorp",
+        OBJ => bless(qr/("[^"]+")/,"Zorp"),
+        JSB => $jstrue,
         );
 
     # Dumping differences per perl version:
@@ -249,7 +250,7 @@ format STDOUT =
     #   IO handles are now blessed into IO::File, I guess?
     #
     if ( $] >= 5.012_000 ) {
-        same( $dump= $o->Data(\%hash)->Out, template( <<'EXPECT', expected_dot => $expected_dot ), "", $o);
+        my $expect = <<'EXPECT';
 $HASH1 = {
            AR  => [
                     1,
@@ -271,15 +272,23 @@ _EOF_FORMAT_
            HR  => { key => 'value' },
            IO  => bless( *{Symbol::gensym()}{IO}, 'IO::File' ),
            IV  => 1,
+           JSB => \1,
            NV  => 3.14159265358979,
            OBJ => bless( qr/("[^"]+")/, 'Zorp' ),
            PV  => 'string',
            PV8 => "ab\ncd\x{20ac}\t",
-           PVM => '',
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
+bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
 EXPECT
+        require B::Deparse;
+        if (new B::Deparse -> coderef2text (
+              sub { no strict; 1; use strict; 1; }
+           ) !~ 'refs') {
+            $expect =~ s/strict 'refs'/strict/;
+        }
+        same( $dump= $o->Data(\%hash)->Out, template( $expect, expected_dot => $expected_dot ), "", $o);
     }
     elsif ( $] >= 5.008_008 ) {
         same( $dump= $o->Data(\%hash)->Out, template( <<'EXPECT', expected_dot => $expected_dot ), "", $o);
@@ -304,14 +313,15 @@ _EOF_FORMAT_
            HR  => { key => 'value' },
            IO  => bless( *{Symbol::gensym()}{IO}, 'IO::Handle' ),
            IV  => 1,
+           JSB => \1,
            NV  => 3.14159265358979,
            OBJ => bless( qr/("[^"]+")/, 'Zorp' ),
            PV  => 'string',
            PV8 => "ab\ncd\x{20ac}\t",
-           PVM => '',
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
+bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
 EXPECT
     }
     elsif ( $] >= 5.008_000 ) {
@@ -337,14 +347,15 @@ _EOF_FORMAT_
            HR  => { key => 'value' },
            IO  => bless( *{Symbol::gensym()}{IO}, 'IO::Handle' ),
            IV  => 1,
+           JSB => \1,
            NV  => 3.14159265358979,
            OBJ => bless( qr/("[^"]+")/, 'Zorp' ),
            PV  => 'string',
            PV8 => "ab\ncd\x{20ac}\t",
-           PVM => '',
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
+bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
 EXPECT
     }
     else {
@@ -362,14 +373,15 @@ $HASH1 = {
            HR  => { key => 'value' },
            IO  => bless( *{Symbol::gensym()}{IO}, 'IO::Handle' ),
            IV  => 1,
+           JSB => \1,
            NV  => 3.14159265358979,
            OBJ => bless( qr/("[^"]+")/, 'Zorp' ),
            PV  => 'string',
            PV8 => "ab\ncd\x{20ac}\t",
-           PVM => '',
            RV  => \do { my $v = expected_dot },
            UND => undef
          };
+bless( $HASH1->{JSB}, 'JSON::XS::Boolean' );
 EXPECT
     }
 }
