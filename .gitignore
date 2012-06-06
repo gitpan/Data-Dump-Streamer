@@ -1,0 +1,10 @@
+*~
+.answer
+Build
+MYMETA.yml
+_build/
+build/
+blib/
+lib/Data/Dump/Streamer.c
+lib/Data/Dump/Streamer.o
+*.tar.gz
