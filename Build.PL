@@ -8,6 +8,7 @@ use My::Builder;
 
 my $build = My::Builder->new(
     module_name => 'Data::Dump::Streamer',
+    dist_author => 'Yves Orton <yves@cpan.org>, Joshua ben Jore <jjore@cpan.org>',
     license => 'perl',
     configure_requires => {
         'perl' => '5.006',
@@ -78,6 +79,11 @@ my $build = My::Builder->new(
 
         # optional for testing
         'JSON::XS'           => 0,
+    },
+    meta_merge => {
+        resources => {
+            repository => 'https://github.com/demerphq/Data-Dump-Streamer'
+        }
     },
 );
 $build->create_build_script();
