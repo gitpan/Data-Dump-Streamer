@@ -34,7 +34,7 @@ $DEBUG=0;
 BEGIN{ $HasPadWalker=eval "use PadWalker 0.99; 1"; }
 
 BEGIN {
-    $VERSION   ='2.36';
+    $VERSION   ='2.37';
     $VERSION = eval $VERSION; # used for beta stuff.
     @ISA       = qw(Exporter DynaLoader);
     @EXPORT=qw(Dump DumpLex DumpVars);
@@ -3698,9 +3698,9 @@ sub _get_lexicals {
     }
 
     my $svo=B::svref_2object($cv);
-    my @pl_array = $svo->PADLIST->ARRAY;
+    my @pl_array = eval { $svo->PADLIST->ARRAY };
 
-    my @name_obj = $pl_array[0]->ARRAY;
+    my @name_obj = eval { $pl_array[0]->ARRAY };
 
     my %named;
     for my $i ( 0..$#name_obj ) {
@@ -3738,7 +3738,7 @@ use B::Deparse;
 our @ISA=qw(B::Deparse);
 my %cache;
 
-our $VERSION = '2.36';
+our $VERSION = '2.37';
 if ( $VERSION ne $Data::Dump::Streamer::VERSION ) {
     die "Incompatible Data::Dump::Streamer::Deparser v$VERSION vs Data::Dump::Streamer v$Data::Dump::Streamer::VERSION";
 }
