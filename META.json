@@ -73,14 +73,14 @@
    "provides" : {
       "Data::Dump::Streamer" : {
          "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.37_02"
+         "version" : "2.38"
       },
       "Data::Dump::Streamer::Deparser" : {
          "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.37_02"
+         "version" : "2.38"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -89,5 +89,5 @@
          "url" : "https://github.com/demerphq/Data-Dump-Streamer"
       }
    },
-   "version" : "2.37_02"
+   "version" : "2.38"
 }
